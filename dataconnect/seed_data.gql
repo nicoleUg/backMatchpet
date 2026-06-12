@@ -1,0 +1,91 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "Seed data is for development purposes and not exposed to regular users.") {
+  user_insertMany(data: [
+    {
+      id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      email: "shelter1@example.com",
+      userType: "Shelter",
+      createdAt: "2024-01-01T10:00:00Z",
+      displayName: "Happy Paws Shelter",
+      phoneNumber: "123-456-7890",
+      profilePictureUrl: "http://example.com/shelter1.jpg"
+    },
+    {
+      id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22",
+      email: "adopter1@example.com",
+      userType: "Adopter",
+      createdAt: "2024-01-02T11:00:00Z",
+      displayName: "Alice Adopter",
+      phoneNumber: "987-654-3210",
+      profilePictureUrl: "http://example.com/adopter1.jpg"
+    }
+  ])
+  shelter_insertMany(data: [
+    {
+      id: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33",
+      userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      name: "Happy Paws Sanctuary",
+      address: "123 Main St",
+      city: "Anytown",
+      state: "CA",
+      zipCode: "90210",
+      contactEmail: "info@happypaws.org",
+      createdAt: "2024-01-01T10:00:00Z",
+      website: "http://happypaws.org",
+      phoneNumber: "555-111-2222",
+      description: "A loving home for all abandoned animals."
+    }
+  ])
+  pet_insertMany(data: [
+    {
+      id: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44",
+      shelterId: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33",
+      name: "Buddy",
+      species: "Dog",
+      breed: "Golden Retriever",
+      age: 3,
+      gender: "Male",
+      status: "Available",
+      createdAt: "2024-01-03T12:00:00Z",
+      size: "Medium",
+      description: "Friendly and playful.",
+      medicalHistory: "Up to date on vaccinations.",
+      personalityTraits: "Energetic, loyal",
+      photoUrls: ["http://example.com/buddy1.jpg", "http://example.com/buddy2.jpg"]
+    },
+    {
+      id: "e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55",
+      shelterId: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33",
+      name: "Whiskers",
+      species: "Cat",
+      breed: "Siamese",
+      age: 2,
+      gender: "Female",
+      status: "Available",
+      createdAt: "2024-01-04T13:00:00Z",
+      size: "Small",
+      description: "Cuddly and curious.",
+      medicalHistory: "Healthy.",
+      personalityTraits: "Calm, affectionate",
+      photoUrls: ["http://example.com/whiskers1.jpg"]
+    }
+  ])
+  watchlist_insertMany(data: [
+    {
+      adopterId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22",
+      petId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44",
+      createdAt: "2024-01-05T14:00:00Z"
+    }
+  ])
+  application_insertMany(data: [
+    {
+      id: "f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a66",
+      adopterId: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22",
+      petId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44",
+      applicationDate: "2024-01-06",
+      status: "Pending",
+      createdAt: "2024-01-06T15:00:00Z",
+      messageToShelter: "Very interested in Buddy!",
+      answersToQuestions: "I have a big yard and previous dog experience."
+    }
+  ])
+}

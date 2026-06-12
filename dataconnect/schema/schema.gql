@@ -1,0 +1,54 @@
+type User @table {
+  email: String!
+  userType: String!
+  createdAt: Timestamp!
+  displayName: String
+  phoneNumber: String
+  profilePictureUrl: String
+}
+
+type Shelter @table {
+  name: String!
+  address: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  contactEmail: String!
+  createdAt: Timestamp!
+  website: String
+  phoneNumber: String
+  description: String
+  user: User
+}
+
+type Pet @table {
+  name: String!
+  species: String!
+  breed: String!
+  age: Int!
+  gender: String!
+  status: String!
+  createdAt: Timestamp!
+  size: String
+  description: String
+  medicalHistory: String
+  personalityTraits: String
+  photoUrls: [String]
+  shelter: Shelter
+}
+
+type Application @table {
+  applicationDate: Date!
+  status: String!
+  createdAt: Timestamp!
+  messageToShelter: String
+  answersToQuestions: String # Representing JSON object as a String
+  adopter: User
+  pet: Pet
+}
+
+type Watchlist @table(key: ["adopter", "pet"]) {
+  createdAt: Timestamp!
+  adopter: User!
+  pet: Pet!
+}

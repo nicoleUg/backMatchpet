@@ -1,0 +1,55 @@
+query GetAllAvailablePets @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it only retrieves publicly available pet information.") {
+  pets(where: {status: {eq: "available"}}) {
+    id
+    name
+    species
+    breed
+    age
+    gender
+    size
+    photoUrls
+    shelter {
+      name
+      city
+      state
+    }
+  }
+}
+
+query GetMyWatchlist @auth(level: USER) {
+  watchlists(where: {adopterId: {eq_expr: "auth.uid"}}) {
+    pet {
+      id
+      name
+      species
+      breed
+      age
+      photoUrls
+    }
+    createdAt
+  }
+}
+
+mutation AddPetToWatchlist($petId: UUID!) @auth(level: USER) {
+  watchlist_insert(data: {
+    adopterId_expr: "auth.uid",
+    petId: $petId,
+    createdAt_expr: "request.time"
+  })
+}
+
+mutation CreateNewShelter($name: String!, $address: String!, $city: String!, $state: String!, $zipCode: String!, $contactEmail: String!, $website: String, $phoneNumber: String, $description: String) @auth(level: USER) {
+  shelter_insert(data: {
+    name: $name,
+    address: $address,
+    city: $city,
+    state: $state,
+    zipCode: $zipCode,
+    contactEmail: $contactEmail,
+    website: $website,
+    phoneNumber: $phoneNumber,
+    description: $description,
+    userId_expr: "auth.uid",
+    createdAt_expr: "request.time"
+  })
+}
