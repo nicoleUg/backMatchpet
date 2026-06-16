@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="PetMatch.API/PetMatch.API.csproj" />
+  <Project Path="PetMatch.Application/PetMatch.Application.csproj" />
+  <Project Path="PetMatch.Domain/PetMatch.Domain.csproj" />
+  <Project Path="PetMatch.Infrastructure/PetMatch.Infrastructure.csproj" />
+  <Project Path="PetMatch.Tests/PetMatch.Tests.csproj" />
+</Solution>

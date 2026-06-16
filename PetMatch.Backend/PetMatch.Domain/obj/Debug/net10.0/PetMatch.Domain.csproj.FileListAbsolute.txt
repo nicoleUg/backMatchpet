@@ -1,0 +1,11 @@
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\bin\Debug\net10.0\PetMatch.Domain.deps.json
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\bin\Debug\net10.0\PetMatch.Domain.dll
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\bin\Debug\net10.0\PetMatch.Domain.pdb
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\PetMatch.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\PetMatch.Domain.AssemblyInfoInputs.cache
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\PetMatch.Domain.AssemblyInfo.cs
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\PetMatch.Domain.csproj.CoreCompileInputs.cache
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\PetMatch.Domain.dll
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\refint\PetMatch.Domain.dll
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\PetMatch.Domain.pdb
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Domain\obj\Debug\net10.0\ref\PetMatch.Domain.dll

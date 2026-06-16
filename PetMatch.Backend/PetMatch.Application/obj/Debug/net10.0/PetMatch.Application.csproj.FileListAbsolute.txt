@@ -1,0 +1,15 @@
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\bin\Debug\net10.0\PetMatch.Application.deps.json
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\bin\Debug\net10.0\PetMatch.Application.dll
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\bin\Debug\net10.0\PetMatch.Application.pdb
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\bin\Debug\net10.0\PetMatch.Domain.dll
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\bin\Debug\net10.0\PetMatch.Domain.pdb
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.Application.csproj.AssemblyReference.cache
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.Application.AssemblyInfoInputs.cache
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.Application.AssemblyInfo.cs
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.Application.csproj.CoreCompileInputs.cache
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.736A7AFD.Up2Date
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.Application.dll
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\refint\PetMatch.Application.dll
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\PetMatch.Application.pdb
+C:\Users\camila\Downloads\GITHUB.005\match-pet\PetMatch.Backend\PetMatch.Application\obj\Debug\net10.0\ref\PetMatch.Application.dll
