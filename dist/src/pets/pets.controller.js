@@ -21,10 +21,16 @@ const query_pets_dto_1 = require("./dto/query-pets.dto");
 const update_pet_dto_1 = require("./dto/update-pet.dto");
 const firebase_auth_guard_1 = require("../auth/guards/firebase-auth.guard");
 const current_user_decorator_1 = require("../common/decorators/current-user.decorator");
+const matches_service_1 = require("../matches/matches.service");
+const adoptions_service_1 = require("../adoptions/adoptions.service");
 let PetsController = class PetsController {
     petsService;
-    constructor(petsService) {
+    matchesService;
+    adoptionsService;
+    constructor(petsService, matchesService, adoptionsService) {
         this.petsService = petsService;
+        this.matchesService = matchesService;
+        this.adoptionsService = adoptionsService;
     }
     create(user, dto) {
         return this.petsService.create(user.uid, dto);
@@ -33,10 +39,10 @@ let PetsController = class PetsController {
         return this.petsService.findAll(query);
     }
     like(user, petId) {
-        return this.petsService.likePet(user.uid, petId);
+        return this.matchesService.likePet(user.uid, petId);
     }
     adopt(user, petId) {
-        return this.petsService.adoptPet(user.uid, petId);
+        return this.adoptionsService.adoptPet(user.uid, petId);
     }
     findOne(id) {
         return this.petsService.findOne(id);
@@ -117,6 +123,8 @@ __decorate([
 exports.PetsController = PetsController = __decorate([
     (0, swagger_1.ApiTags)('pets'),
     (0, common_1.Controller)('pets'),
-    __metadata("design:paramtypes", [pets_service_1.PetsService])
+    __metadata("design:paramtypes", [pets_service_1.PetsService,
+        matches_service_1.MatchesService,
+        adoptions_service_1.AdoptionsService])
 ], PetsController);
 //# sourceMappingURL=pets.controller.js.map

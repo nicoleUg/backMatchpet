@@ -3,41 +3,25 @@ import {
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common';
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
-import { FirebaseService } from '../firebase/firebase/firebase.service';
-import { Pet, PetStatus } from '../pets/interfaces/pet.interface';
+import { FieldValue } from 'firebase-admin/firestore';
+import { PetsRepository, PetDocument } from '../pets/pets.repository';
+import { UsersRepository } from '../users/users.repository';
 import { UsersService } from '../users/users.service';
-
-interface PetDocument {
-	name: string;
-	species: string;
-	gender: string;
-	age: number;
-	breed: string;
-	personality: string;
-	status: string;
-	ownerId: string;
-	photoUrl: string | null;
-	createdAt: Timestamp | string;
-	updatedAt: Timestamp | string;
-}
-
-interface UserDocument {
-	adoptions: string[];
-}
+import { Pet, PetStatus } from '../pets/interfaces/pet.interface';
 
 @Injectable()
 export class AdoptionsService {
 	constructor(
-		private readonly firebaseService: FirebaseService,
+		private readonly petsRepository: PetsRepository,
+		private readonly usersRepository: UsersRepository,
 		private readonly usersService: UsersService,
 	) {}
 
 	async adoptPet(userId: string, petId: string): Promise<Pet> {
-		const userRef = this.firebaseService.firestore.collection('users').doc(userId);
-		const petRef = this.firebaseService.firestore.collection('pets').doc(petId);
+		const userRef = this.usersRepository.getCollectionRef().doc(userId);
+		const petRef = this.petsRepository.getCollectionRef().doc(petId);
 
-		await this.firebaseService.firestore.runTransaction(async (transaction) => {
+		await this.usersRepository.getCollectionRef().firestore.runTransaction(async (transaction) => {
 			const [userSnapshot, petSnapshot] = await Promise.all([
 				transaction.get(userRef),
 				transaction.get(petRef),
@@ -73,52 +57,29 @@ export class AdoptionsService {
 
 		await this.usersService.removePetFromAllMatches(petId);
 
-		const updatedPet = await petRef.get();
-		if (!updatedPet.exists) {
+		const updatedPet = await this.petsRepository.findById(petId);
+		if (!updatedPet) {
 			throw new NotFoundException('Pet not found after adoption');
 		}
 
-		return this.mapPet(updatedPet.id, updatedPet.data() as PetDocument);
+		return updatedPet;
 	}
 
 	async listAdoptionsForUser(userId: string): Promise<Pet[]> {
-		const userSnapshot = await this.firebaseService.firestore
-			.collection('users')
-			.doc(userId)
-			.get();
-
-		if (!userSnapshot.exists) {
+		const user = await this.usersRepository.findById(userId);
+		if (!user) {
 			throw new NotFoundException('User not found');
 		}
 
-		const ids = (userSnapshot.data() as UserDocument).adoptions ?? [];
+		const ids = user.adoptions ?? [];
 		if (ids.length === 0) {
 			return [];
 		}
 
-		const petSnapshots = await Promise.all(
-			ids.map((petId) => this.firebaseService.firestore.collection('pets').doc(petId).get()),
+		const pets = await Promise.all(
+			ids.map((petId) => this.petsRepository.findById(petId)),
 		);
 
-		return petSnapshots
-			.filter((doc) => doc.exists)
-			.map((doc) => this.mapPet(doc.id, doc.data() as PetDocument));
-	}
-
-	private mapPet(id: string, data: PetDocument): Pet {
-		return {
-			id,
-			name: data.name,
-			species: data.species,
-			gender: data.gender,
-			age: data.age,
-			breed: data.breed,
-			personality: data.personality,
-			status: data.status as PetStatus,
-			ownerId: data.ownerId,
-			photoUrl: data.photoUrl ?? null,
-			createdAt: this.firebaseService.toIsoString(data.createdAt),
-			updatedAt: this.firebaseService.toIsoString(data.updatedAt),
-		};
+		return pets.filter((pet): pet is Pet => pet !== null);
 	}
 }

@@ -12,20 +12,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdoptionsService = void 0;
 const common_1 = require("@nestjs/common");
 const firestore_1 = require("firebase-admin/firestore");
-const firebase_service_1 = require("../firebase/firebase/firebase.service");
-const pet_interface_1 = require("../pets/interfaces/pet.interface");
+const pets_repository_1 = require("../pets/pets.repository");
+const users_repository_1 = require("../users/users.repository");
 const users_service_1 = require("../users/users.service");
+const pet_interface_1 = require("../pets/interfaces/pet.interface");
 let AdoptionsService = class AdoptionsService {
-    firebaseService;
+    petsRepository;
+    usersRepository;
     usersService;
-    constructor(firebaseService, usersService) {
-        this.firebaseService = firebaseService;
+    constructor(petsRepository, usersRepository, usersService) {
+        this.petsRepository = petsRepository;
+        this.usersRepository = usersRepository;
         this.usersService = usersService;
     }
     async adoptPet(userId, petId) {
-        const userRef = this.firebaseService.firestore.collection('users').doc(userId);
-        const petRef = this.firebaseService.firestore.collection('pets').doc(petId);
-        await this.firebaseService.firestore.runTransaction(async (transaction) => {
+        const userRef = this.usersRepository.getCollectionRef().doc(userId);
+        const petRef = this.petsRepository.getCollectionRef().doc(petId);
+        await this.usersRepository.getCollectionRef().firestore.runTransaction(async (transaction) => {
             const [userSnapshot, petSnapshot] = await Promise.all([
                 transaction.get(userRef),
                 transaction.get(petRef),
@@ -53,50 +56,30 @@ let AdoptionsService = class AdoptionsService {
             });
         });
         await this.usersService.removePetFromAllMatches(petId);
-        const updatedPet = await petRef.get();
-        if (!updatedPet.exists) {
+        const updatedPet = await this.petsRepository.findById(petId);
+        if (!updatedPet) {
             throw new common_1.NotFoundException('Pet not found after adoption');
         }
-        return this.mapPet(updatedPet.id, updatedPet.data());
+        return updatedPet;
     }
     async listAdoptionsForUser(userId) {
-        const userSnapshot = await this.firebaseService.firestore
-            .collection('users')
-            .doc(userId)
-            .get();
-        if (!userSnapshot.exists) {
+        const user = await this.usersRepository.findById(userId);
+        if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        const ids = userSnapshot.data().adoptions ?? [];
+        const ids = user.adoptions ?? [];
         if (ids.length === 0) {
             return [];
         }
-        const petSnapshots = await Promise.all(ids.map((petId) => this.firebaseService.firestore.collection('pets').doc(petId).get()));
-        return petSnapshots
-            .filter((doc) => doc.exists)
-            .map((doc) => this.mapPet(doc.id, doc.data()));
-    }
-    mapPet(id, data) {
-        return {
-            id,
-            name: data.name,
-            species: data.species,
-            gender: data.gender,
-            age: data.age,
-            breed: data.breed,
-            personality: data.personality,
-            status: data.status,
-            ownerId: data.ownerId,
-            photoUrl: data.photoUrl ?? null,
-            createdAt: this.firebaseService.toIsoString(data.createdAt),
-            updatedAt: this.firebaseService.toIsoString(data.updatedAt),
-        };
+        const pets = await Promise.all(ids.map((petId) => this.petsRepository.findById(petId)));
+        return pets.filter((pet) => pet !== null);
     }
 };
 exports.AdoptionsService = AdoptionsService;
 exports.AdoptionsService = AdoptionsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [firebase_service_1.FirebaseService,
+    __metadata("design:paramtypes", [pets_repository_1.PetsRepository,
+        users_repository_1.UsersRepository,
         users_service_1.UsersService])
 ], AdoptionsService);
 //# sourceMappingURL=adoptions.service.js.map

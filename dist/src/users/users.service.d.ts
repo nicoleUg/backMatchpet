@@ -1,4 +1,5 @@
-import { FirebaseService } from '../firebase/firebase/firebase.service';
+import { UsersRepository } from './users.repository';
+import { PetsRepository } from '../pets/pets.repository';
 import { UserProfile, UserProfileStats } from './interfaces/user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Pet } from '../pets/interfaces/pet.interface';
@@ -9,8 +10,9 @@ interface EnsureUserParams {
     displayName?: string;
 }
 export declare class UsersService {
-    private readonly firebaseService;
-    constructor(firebaseService: FirebaseService);
+    private readonly usersRepository;
+    private readonly petsRepository;
+    constructor(usersRepository: UsersRepository, petsRepository: PetsRepository);
     ensureUserDocument(params: EnsureUserParams): Promise<UserProfile>;
     getById(id: string): Promise<UserProfile>;
     findByUsername(username: string): Promise<UserProfile | null>;
@@ -20,7 +22,5 @@ export declare class UsersService {
     getAdoptions(id: string): Promise<Pet[]>;
     removePetFromAllMatches(petId: string): Promise<void>;
     private getPetsByIds;
-    private mapUser;
-    private mapPet;
 }
 export {};

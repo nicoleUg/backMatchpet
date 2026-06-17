@@ -19,6 +19,14 @@ let FirebaseAuthGuard = class FirebaseAuthGuard {
     }
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
+        if (process.env.BYPASS_AUTH_FOR_TESTS === 'true') {
+            request.user = {
+                uid: 'jmeter-test-uid',
+                email: 'jmeter-test@example.com',
+                name: 'JMeter Test User',
+            };
+            return true;
+        }
         const authHeader = request.headers.authorization;
         if (!authHeader?.startsWith('Bearer ')) {
             throw new common_1.UnauthorizedException('Missing or invalid Authorization header');

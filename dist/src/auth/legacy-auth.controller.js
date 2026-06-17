@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const auth_service_1 = require("./auth.service");
 const legacy_register_dto_1 = require("./dto/legacy-register.dto");
 const legacy_login_dto_1 = require("./dto/legacy-login.dto");
+const firebase_auth_guard_1 = require("./guards/firebase-auth.guard");
 let LegacyAuthController = class LegacyAuthController {
     authService;
     constructor(authService) {
@@ -54,6 +55,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], LegacyAuthController.prototype, "login", null);
 __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(firebase_auth_guard_1.FirebaseAuthGuard),
     (0, common_1.Get)('sessions'),
     __param(0, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),

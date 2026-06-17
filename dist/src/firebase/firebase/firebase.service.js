@@ -59,6 +59,12 @@ let FirebaseService = class FirebaseService {
         if (admin.apps.length > 0) {
             return admin.app();
         }
+        const projectId = process.env.FIREBASE_PROJECT_ID;
+        if (process.env.FIRESTORE_EMULATOR_HOST || process.env.FIREBASE_AUTH_EMULATOR_HOST) {
+            return admin.initializeApp({
+                projectId: projectId || 'matchpet-66093',
+            });
+        }
         const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
         if (serviceAccountJson) {
             const parsed = JSON.parse(serviceAccountJson);
@@ -66,7 +72,6 @@ let FirebaseService = class FirebaseService {
                 credential: admin.credential.cert(parsed),
             });
         }
-        const projectId = process.env.FIREBASE_PROJECT_ID;
         const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
         const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replaceAll(String.raw `\n`, '\n');
         if (projectId && clientEmail && privateKey) {

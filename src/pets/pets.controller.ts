@@ -17,11 +17,17 @@ import { UpdatePetDto } from './dto/update-pet.dto';
 import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
 import { CurrentUserDecorator } from '../common/decorators/current-user.decorator';
 import type { CurrentUser } from '../common/interfaces/current-user.interface';
+import { MatchesService } from '../matches/matches.service';
+import { AdoptionsService } from '../adoptions/adoptions.service';
 
 @ApiTags('pets')
 @Controller('pets')
 export class PetsController {
-	constructor(private readonly petsService: PetsService) {}
+	constructor(
+		private readonly petsService: PetsService,
+		private readonly matchesService: MatchesService,
+		private readonly adoptionsService: AdoptionsService,
+	) {}
 
 	@ApiBearerAuth()
 	@UseGuards(FirebaseAuthGuard)
@@ -39,14 +45,14 @@ export class PetsController {
 	@UseGuards(FirebaseAuthGuard)
 	@Post(':id/like')
 	like(@CurrentUserDecorator() user: CurrentUser, @Param('id') petId: string) {
-		return this.petsService.likePet(user.uid, petId);
+		return this.matchesService.likePet(user.uid, petId);
 	}
 
 	@ApiBearerAuth()
 	@UseGuards(FirebaseAuthGuard)
 	@Post(':id/adopt')
 	adopt(@CurrentUserDecorator() user: CurrentUser, @Param('id') petId: string) {
-		return this.petsService.adoptPet(user.uid, petId);
+		return this.adoptionsService.adoptPet(user.uid, petId);
 	}
 
 	@Get(':id')

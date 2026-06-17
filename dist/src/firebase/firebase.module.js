@@ -9,14 +9,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FirebaseModule = void 0;
 const common_1 = require("@nestjs/common");
 const firebase_service_1 = require("./firebase/firebase.service");
+const pets_repository_1 = require("../pets/pets.repository");
+const users_repository_1 = require("../users/users.repository");
 let FirebaseModule = class FirebaseModule {
 };
 exports.FirebaseModule = FirebaseModule;
 exports.FirebaseModule = FirebaseModule = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({
-        providers: [firebase_service_1.FirebaseService],
-        exports: [firebase_service_1.FirebaseService],
+        providers: [firebase_service_1.FirebaseService, pets_repository_1.PetsRepository, users_repository_1.UsersRepository],
+        exports: [firebase_service_1.FirebaseService, pets_repository_1.PetsRepository, users_repository_1.UsersRepository],
     })
 ], FirebaseModule);
 //# sourceMappingURL=firebase.module.js.map

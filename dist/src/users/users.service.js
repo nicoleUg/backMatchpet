@@ -12,93 +12,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const firestore_1 = require("firebase-admin/firestore");
-const firebase_service_1 = require("../firebase/firebase/firebase.service");
+const users_repository_1 = require("./users.repository");
+const pets_repository_1 = require("../pets/pets.repository");
 let UsersService = class UsersService {
-    firebaseService;
-    constructor(firebaseService) {
-        this.firebaseService = firebaseService;
+    usersRepository;
+    petsRepository;
+    constructor(usersRepository, petsRepository) {
+        this.usersRepository = usersRepository;
+        this.petsRepository = petsRepository;
     }
     async ensureUserDocument(params) {
-        const userRef = this.firebaseService.firestore.collection('users').doc(params.uid);
-        const snapshot = await userRef.get();
-        if (!snapshot.exists) {
-            const now = new Date().toISOString();
-            const data = {
-                fullName: params.fullName ?? '',
-                displayName: params.displayName ?? params.fullName ?? '',
-                email: params.email,
-                matches: [],
-                adoptions: [],
-                phone: '',
-                location: '',
-                bio: '',
-                createdAt: now,
-                updatedAt: now,
-            };
-            await userRef.set(data);
-            return this.mapUser(params.uid, data);
-        }
-        const existing = snapshot.data();
-        if (!existing.email) {
-            await userRef.update({
-                email: params.email,
-                updatedAt: new Date().toISOString(),
-            });
-            existing.email = params.email;
-        }
-        return this.mapUser(params.uid, existing);
+        return this.usersRepository.ensureUserDocument(params);
     }
     async getById(id) {
-        const snapshot = await this.firebaseService.firestore.collection('users').doc(id).get();
-        if (!snapshot.exists) {
+        const user = await this.usersRepository.findById(id);
+        if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        return this.mapUser(id, snapshot.data());
+        return user;
     }
     async findByUsername(username) {
-        const byDisplayName = await this.firebaseService.firestore
-            .collection('users')
-            .where('displayName', '==', username)
-            .limit(1)
-            .get();
-        if (!byDisplayName.empty) {
-            const doc = byDisplayName.docs[0];
-            return this.mapUser(doc.id, doc.data());
+        const byDisplayName = await this.usersRepository.findByDisplayName(username);
+        if (byDisplayName) {
+            return byDisplayName;
         }
-        const byFullName = await this.firebaseService.firestore
-            .collection('users')
-            .where('fullName', '==', username)
-            .limit(1)
-            .get();
-        if (byFullName.empty) {
-            return null;
-        }
-        const doc = byFullName.docs[0];
-        return this.mapUser(doc.id, doc.data());
+        return this.usersRepository.findByFullName(username);
     }
     async updateMe(uid, dto) {
-        const ref = this.firebaseService.firestore.collection('users').doc(uid);
-        const snapshot = await ref.get();
-        if (!snapshot.exists) {
+        const user = await this.usersRepository.findById(uid);
+        if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        const patch = {
-            ...dto,
-            updatedAt: new Date().toISOString(),
-        };
-        await ref.update(patch);
-        const updated = await ref.get();
-        return this.mapUser(uid, updated.data());
+        return this.usersRepository.update(uid, dto);
     }
     async getProfile(id) {
         const user = await this.getById(id);
-        const petsSnapshot = await this.firebaseService.firestore
-            .collection('pets')
-            .where('ownerId', '==', id)
-            .get();
+        const publishedPets = await this.petsRepository.findAll({ ownerId: id });
         return {
             ...user,
-            publishedPetsCount: petsSnapshot.size,
+            publishedPetsCount: publishedPets.length,
             matchesCount: user.matches.length,
             adoptionsCount: user.adoptions.length,
         };
@@ -112,14 +64,11 @@ let UsersService = class UsersService {
         return this.getPetsByIds(user.adoptions);
     }
     async removePetFromAllMatches(petId) {
-        const usersSnapshot = await this.firebaseService.firestore
-            .collection('users')
-            .where('matches', 'array-contains', petId)
-            .get();
+        const usersSnapshot = await this.usersRepository.findUsersByMatch(petId);
         if (usersSnapshot.empty) {
             return;
         }
-        const batch = this.firebaseService.firestore.batch();
+        const batch = this.usersRepository.getCollectionRef().firestore.batch();
         for (const userDoc of usersSnapshot.docs) {
             batch.update(userDoc.ref, {
                 matches: firestore_1.FieldValue.arrayRemove(petId),
@@ -132,46 +81,14 @@ let UsersService = class UsersService {
         if (ids.length === 0) {
             return [];
         }
-        const snapshots = await Promise.all(ids.map((petId) => this.firebaseService.firestore.collection('pets').doc(petId).get()));
-        return snapshots
-            .filter((doc) => doc.exists)
-            .map((doc) => this.mapPet(doc.id, doc.data()));
-    }
-    mapUser(id, data) {
-        return {
-            id,
-            fullName: data.fullName ?? '',
-            displayName: data.displayName ?? data.fullName ?? '',
-            email: data.email,
-            matches: data.matches ?? [],
-            adoptions: data.adoptions ?? [],
-            phone: data.phone ?? '',
-            location: data.location ?? '',
-            bio: data.bio ?? '',
-            createdAt: this.firebaseService.toIsoString(data.createdAt),
-            updatedAt: this.firebaseService.toIsoString(data.updatedAt),
-        };
-    }
-    mapPet(id, data) {
-        return {
-            id,
-            name: data.name,
-            species: data.species,
-            gender: data.gender,
-            age: data.age,
-            breed: data.breed,
-            personality: data.personality,
-            status: data.status,
-            ownerId: data.ownerId,
-            photoUrl: data.photoUrl ?? null,
-            createdAt: this.firebaseService.toIsoString(data.createdAt),
-            updatedAt: this.firebaseService.toIsoString(data.updatedAt),
-        };
+        const snapshots = await Promise.all(ids.map((petId) => this.petsRepository.findById(petId)));
+        return snapshots.filter((pet) => pet !== null);
     }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [firebase_service_1.FirebaseService])
+    __metadata("design:paramtypes", [users_repository_1.UsersRepository,
+        pets_repository_1.PetsRepository])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

@@ -17,6 +17,16 @@ export class FirebaseAuthGuard implements CanActivate {
       user?: CurrentUser;
     }>();
 
+    // Check if auth bypass is enabled for local JMeter performance testing
+    if (process.env.BYPASS_AUTH_FOR_TESTS === 'true') {
+      request.user = {
+        uid: 'jmeter-test-uid',
+        email: 'jmeter-test@example.com',
+        name: 'JMeter Test User',
+      };
+      return true;
+    }
+
     const authHeader = request.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
       throw new UnauthorizedException('Missing or invalid Authorization header');

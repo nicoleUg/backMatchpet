@@ -12,37 +12,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatchesService = void 0;
 const common_1 = require("@nestjs/common");
 const firestore_1 = require("firebase-admin/firestore");
-const firebase_service_1 = require("../firebase/firebase/firebase.service");
+const pets_repository_1 = require("../pets/pets.repository");
+const users_repository_1 = require("../users/users.repository");
 const pet_interface_1 = require("../pets/interfaces/pet.interface");
 let MatchesService = class MatchesService {
-    firebaseService;
-    constructor(firebaseService) {
-        this.firebaseService = firebaseService;
+    petsRepository;
+    usersRepository;
+    constructor(petsRepository, usersRepository) {
+        this.petsRepository = petsRepository;
+        this.usersRepository = usersRepository;
     }
     async likePet(userId, petId) {
-        const userRef = this.firebaseService.firestore.collection('users').doc(userId);
-        const petRef = this.firebaseService.firestore.collection('pets').doc(petId);
-        const [userSnapshot, petSnapshot] = await Promise.all([userRef.get(), petRef.get()]);
-        if (!userSnapshot.exists) {
+        const [user, pet] = await Promise.all([
+            this.usersRepository.findById(userId),
+            this.petsRepository.findById(petId),
+        ]);
+        if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        if (!petSnapshot.exists) {
+        if (!pet) {
             throw new common_1.NotFoundException('Pet not found');
         }
-        const petData = petSnapshot.data();
-        if (petData.status === pet_interface_1.PetStatus.ADOPTED) {
+        if (pet.status === pet_interface_1.PetStatus.ADOPTED) {
             throw new common_1.ConflictException('Adopted pets cannot be liked');
         }
-        const userData = userSnapshot.data();
-        const currentMatches = userData.matches ?? [];
+        const currentMatches = user.matches ?? [];
         if (!currentMatches.includes(petId)) {
+            const userRef = this.usersRepository.getCollectionRef().doc(userId);
             await userRef.update({
                 matches: firestore_1.FieldValue.arrayUnion(petId),
                 updatedAt: new Date().toISOString(),
             });
         }
-        const updatedUser = await userRef.get();
-        const updatedMatches = updatedUser.data().matches ?? [];
+        const updatedUser = await this.usersRepository.findById(userId);
+        const updatedMatches = updatedUser?.matches ?? [];
         return {
             success: true,
             petId,
@@ -51,43 +54,24 @@ let MatchesService = class MatchesService {
         };
     }
     async listMatchesForUser(userId) {
-        const userSnapshot = await this.firebaseService.firestore
-            .collection('users')
-            .doc(userId)
-            .get();
-        if (!userSnapshot.exists) {
+        const user = await this.usersRepository.findById(userId);
+        if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        const ids = userSnapshot.data().matches ?? [];
+        const ids = user.matches ?? [];
         if (ids.length === 0) {
             return [];
         }
-        const petSnapshots = await Promise.all(ids.map((petId) => this.firebaseService.firestore.collection('pets').doc(petId).get()));
-        return petSnapshots
-            .filter((doc) => doc.exists)
-            .map((doc) => this.mapPet(doc.id, doc.data()))
+        const pets = await Promise.all(ids.map((petId) => this.petsRepository.findById(petId)));
+        return pets
+            .filter((pet) => pet !== null)
             .filter((pet) => pet.status !== pet_interface_1.PetStatus.ADOPTED);
-    }
-    mapPet(id, data) {
-        return {
-            id,
-            name: data.name,
-            species: data.species,
-            gender: data.gender,
-            age: data.age,
-            breed: data.breed,
-            personality: data.personality,
-            status: data.status,
-            ownerId: data.ownerId,
-            photoUrl: data.photoUrl ?? null,
-            createdAt: this.firebaseService.toIsoString(data.createdAt),
-            updatedAt: this.firebaseService.toIsoString(data.updatedAt),
-        };
     }
 };
 exports.MatchesService = MatchesService;
 exports.MatchesService = MatchesService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [firebase_service_1.FirebaseService])
+    __metadata("design:paramtypes", [pets_repository_1.PetsRepository,
+        users_repository_1.UsersRepository])
 ], MatchesService);
 //# sourceMappingURL=matches.service.js.map

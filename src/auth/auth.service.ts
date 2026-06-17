@@ -158,14 +158,17 @@ export class AuthService {
 		method: 'accounts:signUp' | 'accounts:signInWithPassword',
 		payload: Record<string, unknown>,
 	) {
-		const webApiKey = process.env.FIREBASE_WEB_API_KEY;
+		const emulatorHost = process.env.FIREBASE_AUTH_EMULATOR_HOST;
+		const webApiKey = process.env.FIREBASE_WEB_API_KEY || (emulatorHost ? 'fake-web-api-key' : undefined);
 		if (!webApiKey) {
 			throw new InternalServerErrorException(
 				'FIREBASE_WEB_API_KEY is required for auth endpoints',
 			);
 		}
 
-		const endpoint = `https://identitytoolkit.googleapis.com/v1/${method}?key=${webApiKey}`;
+		const endpoint = emulatorHost
+			? `http://${emulatorHost}/identitytoolkit.googleapis.com/v1/${method}?key=${webApiKey}`
+			: `https://identitytoolkit.googleapis.com/v1/${method}?key=${webApiKey}`;
 
 		const response = await fetch(endpoint, {
 			method: 'POST',

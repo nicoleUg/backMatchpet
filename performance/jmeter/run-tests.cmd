@@ -23,7 +23,7 @@ for /f "tokens=1-4 delims=/:-. " %%a in ('echo %date% %time%') do set TS=%%d%%b%
 set JTL=%RESULTS_DIR%\result_%TS%.jtl
 set REPORT=%RESULTS_DIR%\report_%TS%
 
-"%JMETER_BIN%" -n -t "%PLAN%" -l "%JTL%" -e -o "%REPORT%" -Jhost=%SERVER_NAME% -Jport=%PORT% -Jprotocol=%PROTOCOL%
+call "%JMETER_BIN%" -n -t "%PLAN%" -l "%JTL%" -e -o "%REPORT%" -Jhost=%SERVER_NAME% -Jport=%PORT% -Jprotocol=%PROTOCOL%
 
 echo Ejecucion finalizada
 echo JTL: %JTL%
